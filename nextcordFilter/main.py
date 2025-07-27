@@ -194,6 +194,40 @@ async def getchunk(interaction: Interaction, message):
     c = getChunk(message)
     await interaction.response.send_message("Censored part is: " + c)
 
+@bot.slash_command(description="Add all letters in a word to sub list", guild_ids=[TESTING_GUILD_ID])
+@commands.has_permissions(manage_guild=True)
+async def subwhole(interaction: Interaction, message, letters):
+    message = message.lower()
+    letters = letters.lower()
+
+    if len(message) != len(letters):
+        await interaction.response.send_message("Message and letters must be the same length", ephemeral=True)
+        return
+
+    for i in range(len(message)):
+        substitutes[message[i]] = letters[i]
+
+    save_filter_data()
+    await interaction.response.send_message("Done")
+
+
+@bot.slash_command(description="Remove all letters in a word from the sub list", guild_ids=[TESTING_GUILD_ID])
+@commands.has_permissions(manage_guild=True)
+async def removesubwhole(interaction: Interaction, message):
+    message = message.lower()
+    removed = []
+    for char in message:
+        if char in substitutes:
+            substitutes.pop(char)
+            removed.append(char)
+    save_filter_data()
+    if removed:
+        await interaction.response.send_message(f"Removed substitutions for: `{''.join(removed)}`", delete_after=2)
+    else:
+        await interaction.response.send_message("No substitutions found to remove.", delete_after=2)
+
+    
+
 # ------------- MEMORY TRACKING COMMANDS -------------
 @bot.slash_command(description="Track memory usage", guild_ids=[TESTING_GUILD_ID])
 @commands.has_permissions(read_message_history=True)
