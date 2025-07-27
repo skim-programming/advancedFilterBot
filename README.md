@@ -17,6 +17,8 @@
 /ezbypass [message] - Allows messages to be sent that are that length EXACTLY (/addww works, just test for _ feature)
 /ezbypass [message] - Removes an ezbypass of a message
 /getchunk [message] - Find the censored part of a message
+/subwhole [sub message] [message] - Subs every letter in the message with the second parameter's letters
+/removesubwhole [message] - Removes all subs in message
 
 For /addww, /addbw, /removebw, /removeww, you can use _ as a placeholder for any letter
 (For example, n_iger bans any letter in place of the _ such as nbiger or nliger)
