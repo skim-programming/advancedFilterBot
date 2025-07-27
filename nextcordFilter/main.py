@@ -4,10 +4,10 @@ from nextcord import Interaction
 import json
 import tracemalloc
 import gc
-from ofa import filter, blacklist, substitutes, whitelist, messageThreshold, is_valid_pattern
+from ofa import filter, blacklist, substitutes, whitelist, messageThreshold, is_valid_pattern, getChunk
 import emoji
 
-TESTING_GUILD_ID =   # Replace with your guild ID
+TESTING_GUILD_ID = 1259717095382319215  # Replace with your guild ID
 
 # ---------------- INTENTS ----------------
 intents = nextcord.Intents.default()
@@ -47,8 +47,7 @@ async def on_message(message):
         await channel.send(msg, delete_after=2)
         await channel.send("aight ts working on bro", delete_after=2)
 
-    score, _ = filter(message.content)
-    if filter(score) > messageThreshold:
+    if filter(message.content) > messageThreshold:
         try:
             await message.delete()
             await message.channel.send(f"{message.author.mention} naughty...", delete_after=2)
@@ -191,8 +190,8 @@ async def mimic(interaction: Interaction, channelid, message):
 
 @bot.slash_command(description="Find censored part of word", guild_ids=[TESTING_GUILD_ID])
 @commands.has_permissions(manage_guild=True)
-async def getcensor(interaction: Interaction, message):
-    score, c = filter(message)
+async def getchunk(interaction: Interaction, message):
+    c = getChunk(message)
     await interaction.response.send_message("Censored part is: " + c)
 
 # ------------- MEMORY TRACKING COMMANDS -------------
