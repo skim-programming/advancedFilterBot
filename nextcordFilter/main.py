@@ -47,7 +47,8 @@ async def on_message(message):
         await channel.send(msg, delete_after=2)
         await channel.send("aight ts working on bro", delete_after=2)
 
-    if filter(message.content) > messageThreshold:
+    score, _ = filter(message.content)
+    if filter(score) > messageThreshold:
         try:
             await message.delete()
             await message.channel.send(f"{message.author.mention} naughty...", delete_after=2)
@@ -178,7 +179,7 @@ async def viewsub(interaction: Interaction):
 
 @bot.slash_command(description="Mimics what you say", guild_ids=[TESTING_GUILD_ID])
 @commands.has_permissions(manage_guild=True)
-async def mimic(interaction: Interaction, channelid: str, message: str):
+async def mimic(interaction: Interaction, channelid, message):
     try:
         channel = bot.get_channel(int(channelid))
         if channel is None:
@@ -187,6 +188,12 @@ async def mimic(interaction: Interaction, channelid: str, message: str):
         await interaction.response.send_message(f"Sent message to <#{channelid}>")
     except Exception:
         await interaction.response.send_message("Invalid channel ID or bot lacks access.")
+
+@bot.slash_command(description="Find censored part of word", guild_ids=[TESTING_GUILD_ID])
+@commands.has_permissions(manage_guild=True)
+async def getcensor(interaction: Interaction, message):
+    score, c = filter(message)
+    await interaction.response.send_message("Censored part is: " + c)
 
 # ------------- MEMORY TRACKING COMMANDS -------------
 @bot.slash_command(description="Track memory usage", guild_ids=[TESTING_GUILD_ID])
