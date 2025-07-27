@@ -27,6 +27,7 @@ def blregex(blacklist, text):
 def qFilter(text):
     text = text.lower()
     highest = 0
+    highestchunk = ""
 
     # Step 1: Check underscore patterns with regex matching
     score, _, _ = blregex(blacklist, text)
@@ -43,9 +44,9 @@ def qFilter(text):
             chunk = text[i:i+plen]
             score = fuzz.ratio(pattern_lower, chunk)
             if score > highest:
+                highestchunk = chunk
                 highest = score
-
-    return highest
+    return highest, highestchunk
 
 
 with open('data.json', 'r', encoding="utf-8") as f:
@@ -87,27 +88,27 @@ def filter(message):
     # Step 3: Now remove whitelist words for fuzzy matching steps if desired
     cleaned = remove_whitelist_words(lowered, whitelist)
     #print("Cleaned: " + cleaned)
-    score = qFilter(cleaned)
+    score, c = qFilter(cleaned)
     if score > highest:
         highest = score
 
     # Step 4: Fuzzy matching with substitutions, spaces removed, duplicates removed
     cleaned = "".join(findSub(c) for c in cleaned)
-    score = qFilter(cleaned)
+    score, c = qFilter(cleaned)
     if score > highest:
         highest = score
 
     cleaned = cleaned.replace(" ", "")
-    score = qFilter(cleaned)
+    score, c = qFilter(cleaned)
     if score > highest:
         highest = score
 
     cleaned = remove_duplicates(cleaned)
-    score = qFilter(cleaned)
+    score, c = qFilter(cleaned)
     if score > highest:
         highest = score
 
-    return highest
+    return highest, c
 
 
 # Test
@@ -133,5 +134,5 @@ tests = [
 ]
 
 for t in tests:
-    highest = filter(t)
+    highest, _ = filter(t)
     print(f"{t:<30}: {highest:.2f}")
