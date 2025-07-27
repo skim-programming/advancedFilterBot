@@ -27,7 +27,6 @@ def blregex(blacklist, text):
 def qFilter(text):
     text = text.lower()
     highest = 0
-    highestchunk = ""
 
     # Step 1: Check underscore patterns with regex matching
     score, _, _ = blregex(blacklist, text)
@@ -44,9 +43,8 @@ def qFilter(text):
             chunk = text[i:i+plen]
             score = fuzz.ratio(pattern_lower, chunk)
             if score > highest:
-                highestchunk = chunk
                 highest = score
-    return highest, highestchunk
+    return highest
 
 
 with open('data.json', 'r', encoding="utf-8") as f:
@@ -69,6 +67,23 @@ def remove_duplicates(s):
             result.append(c)
     return "".join(result)
 
+def getChunk(message):
+    text = text.lower()
+    cleaned = "".join(findSub(c) for c in text)
+    highestChunk = ""
+    remove_whitelist_words(cleaned)
+    for pattern in blacklist:
+        if "_" in pattern:
+            continue  # skip underscore patterns; already checked above
+        plen = len(pattern)
+        pattern_lower = pattern.lower()
+        for i in range(len(cleaned) - plen + 1):
+            chunk = cleaned[i:i+plen]
+            score = fuzz.ratio(pattern_lower, chunk)
+            if score > highest:
+                highestChunk = chunk
+    return highestChunk
+
 def remove_whitelist_words(text, whitelist_patterns):
     for pattern in whitelist_patterns:
         text = text.replace(pattern.lower(), "")
@@ -88,27 +103,27 @@ def filter(message):
     # Step 3: Now remove whitelist words for fuzzy matching steps if desired
     cleaned = remove_whitelist_words(lowered, whitelist)
     #print("Cleaned: " + cleaned)
-    score, c = qFilter(cleaned)
+    score = qFilter(cleaned)
     if score > highest:
         highest = score
 
     # Step 4: Fuzzy matching with substitutions, spaces removed, duplicates removed
     cleaned = "".join(findSub(c) for c in cleaned)
-    score, c = qFilter(cleaned)
+    score = qFilter(cleaned)
     if score > highest:
         highest = score
 
     cleaned = cleaned.replace(" ", "")
-    score, c = qFilter(cleaned)
+    score = qFilter(cleaned)
     if score > highest:
         highest = score
 
     cleaned = remove_duplicates(cleaned)
-    score, c = qFilter(cleaned)
+    score = qFilter(cleaned)
     if score > highest:
         highest = score
 
-    return highest, c
+    return highest
 
 
 # Test
@@ -134,5 +149,5 @@ tests = [
 ]
 
 for t in tests:
-    highest, _ = filter(t)
+    highest = filter(t)
     print(f"{t:<30}: {highest:.2f}")
