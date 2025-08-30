@@ -24,3 +24,5 @@ For /addww, /addbw, /removebw, /removeww, you can use _ as a placeholder for any
 (For example, n_iger bans any letter in place of the _ such as nbiger or nliger)
 
 thats all thanks
+
+# Note: Rewrititen in DPP, polished and optimized
